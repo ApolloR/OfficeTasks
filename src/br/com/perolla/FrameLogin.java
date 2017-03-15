@@ -26,7 +26,10 @@ import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
+import com.sun.javafx.geom.transform.GeneralTransform3D;
+
 import CustomComponents.ImagePanel;
+import dao.ConexaoBD;
 
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -35,12 +38,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.Point;
 import javax.swing.JPanel;
 import javax.swing.JDesktopPane;
 import javax.swing.DebugGraphics;
 import java.awt.Cursor;
+import images.*;
 
 public class FrameLogin implements ActionListener {
 
@@ -59,7 +65,7 @@ public class FrameLogin implements ActionListener {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {
+				try {									
 					FrameLogin window = new FrameLogin();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -86,32 +92,20 @@ public class FrameLogin implements ActionListener {
 		
 		
 		/* Icone de usuário */
-		setIconAplication();
 		
-		
-		
+		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100));
 			    
-		txt_Login = new JTextField();
-		txt_Login.setBounds(126, 131, 160, 30);
-		frame.getContentPane().add(txt_Login);
-		txt_Login.setColumns(10);
-		
-		btn_Entrar = new JButton("Entrar");
-		btn_Entrar.addActionListener(this);
+		buttonCreation();
+		textFieldsCreation();		
+		labelsCreation();
 		
 		
-		btn_Entrar.setFocusPainted(false);
-		btn_Entrar.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		btn_Entrar.setForeground(new Color(255, 255, 255));
-		btn_Entrar.setBackground(new Color(0, 0, 0));
-		btn_Entrar.setFont(new Font("Tahoma", Font.BOLD, 18));
-		btn_Entrar.setBounds(62, 224, 224, 30);
-		frame.getContentPane().add(btn_Entrar);
 		
-		txt_Senha = new JPasswordField();
-		txt_Senha.setBounds(126, 176, 160, 30);
-		frame.getContentPane().add(txt_Senha);
 		
+		
+	}
+
+	private void labelsCreation() {
 		JLabel lblSenha = new JLabel("Senha");
 		lblSenha.setForeground(new Color(255, 255, 255));
 		lblSenha.setBounds(70, 176, 59, 30);
@@ -125,16 +119,40 @@ public class FrameLogin implements ActionListener {
 		frame.getContentPane().add(lblLogin_1);
 	}
 
-	private void setIconAplication() {
+	private void textFieldsCreation() {
+		txt_Login = new JTextField();
+		txt_Login.setBounds(126, 131, 160, 30);
+		frame.getContentPane().add(txt_Login);		
+		txt_Login.setColumns(10);
+		
+		txt_Senha = new JPasswordField();
+		txt_Senha.setBounds(126, 176, 160, 30);
+		frame.getContentPane().add(txt_Senha);
+	}
+
+	private void buttonCreation() {
+		btn_Entrar = new JButton("Entrar");
+		btn_Entrar.addActionListener(this);				
+		btn_Entrar.setFocusPainted(false);
+		btn_Entrar.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		btn_Entrar.setForeground(new Color(255, 255, 255));
+		btn_Entrar.setBackground(new Color(0, 0, 0));
+		btn_Entrar.setFont(new Font("Tahoma", Font.BOLD, 18));
+		btn_Entrar.setBounds(62, 224, 224, 30);
+		frame.getContentPane().add(btn_Entrar);
+	}
+
+	public final JLabel setIconAplication(String pathImage,int heith,int weidth) {
 		Image img = null;
 		try {
-			 img= ImageIO.read(FrameLogin.class.getResource("/images/log_icon.png"));
+			
+			 img= ImageIO.read(FrameLogin.class.getResource(pathImage));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		Image bimg =  img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+		Image bimg =  img.getScaledInstance(weidth,heith, Image.SCALE_SMOOTH);
 		
 		
 		ImageIcon icon = new ImageIcon(bimg);
@@ -144,11 +162,13 @@ public class FrameLogin implements ActionListener {
 		login_icon.setFont(login_icon.getFont().deriveFont(login_icon.getFont().getStyle() | Font.BOLD));
 		login_icon.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
 		
-	  
+		System.out.println("SetIconApplication - Caminho absoluto:" + FrameLogin.class.getResource("/images/log_icon.png"));
 		login_icon.setDisabledIcon(new ImageIcon(FrameLogin.class.getResource("/images/log_icon.png")));
 		login_icon.setDebugGraphicsOptions(DebugGraphics.BUFFERED_OPTION);
 		login_icon.setBounds(126, 11, 100, 100);
-		frame.getContentPane().add(login_icon);
+		
+		return login_icon;
+		
 	}
 	
 	public void defineTam(int altura,int largura){
@@ -165,12 +185,12 @@ public class FrameLogin implements ActionListener {
 	}
 	
 	public void defineBackground(){
-		File file = new File("C:/Users/Perolla/workspace/Tarefas/src/images/escritorio.jpg");
+
 		Image img = null;
-		try {
-			img = ImageIO.read(new File(file.getAbsolutePath()));										
-		} catch (IOException e) {
-			e.printStackTrace();
+		try {													
+			img = ImageIO.read(getClass().getResource("/images/escritorio.jpg"));
+		} catch (IOException e) {			
+			e.printStackTrace();			
 		}
 		/***********************************************/
 		

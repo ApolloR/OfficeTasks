@@ -3,6 +3,7 @@ package CustomComponents;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JFormattedTextField.AbstractFormatter;
 
@@ -12,9 +13,10 @@ public class DateLabelFormatter extends AbstractFormatter {
 	private String datePattern = "dd-MM-yyyy";
 	private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
-	@Override
-	public Object stringToValue(String text) throws ParseException {
 
+		
+	@Override
+	public Object stringToValue(String text) throws ParseException {		
 		return dateFormatter.parseObject(text);
 	}
 
