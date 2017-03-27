@@ -1,4 +1,4 @@
-package Model;
+package bean;
 
 import java.sql.Date;
 

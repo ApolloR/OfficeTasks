@@ -1,4 +1,4 @@
-package br.com.perolla;
+package view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -23,9 +23,11 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import CustomComponents.DateLabelFormatter;
-import Model.Tarefa;
-import dao.ConexaoBD;
+import bean.Tarefa;
+import controller.Controller;
+import interfaces.MVP;
 import javafx.scene.control.DatePicker;
+import model.ConexaoBD;
 
 import java.awt.GridLayout;
 import javax.swing.JTable;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -50,6 +53,11 @@ import java.awt.Color;
 import java.awt.Panel;
 import javax.swing.JLabel;
 import java.awt.Font;
+import javax.swing.UIManager;
+import javax.swing.SwingConstants;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+import java.awt.Insets;
 
 public class FrameGerenciaTarefas extends JFrame {
 
@@ -59,14 +67,19 @@ public class FrameGerenciaTarefas extends JFrame {
 	private JTable table;
 	private JButton btn_EscolheData;
 	private JPanel panel;
-	ConexaoBD conexaoBD = new ConexaoBD();
+	
 	JDatePickerImpl datePicker;
 	JScrollPane scrollPane;
+	FrameLogin frameLogin;
+	JLabel lbl_logo;
+	private String current_date ;
+	private MVP.ControllerImpl controler = new Controller();
+	ConexaoBD conexao = new ConexaoBD();
+	
 	
 	
 	
 	List<Tarefa> lstTarefas = new ArrayList();
-	private JLabel lblNewLabel;
 	
 
 	/**
@@ -104,57 +117,98 @@ public class FrameGerenciaTarefas extends JFrame {
 		y = (int) ((dimension.getHeight() - getHeight())/2);
 		setLocation(x, y);
 		contentPane = new JPanel();
-		contentPane.setBackground(new Color(204, 204, 255));
+		contentPane.setBackground(SystemColor.inactiveCaptionBorder);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);				
+		java.util.Date date = new Date();
+		current_date = java.text.DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
 		
-		initButtons();		
-		initImages();
+		System.out.println(current_date.replace("/", "-"));
 		
-		lstTarefas = getTasks("");		
-		carregaTabela(lstTarefas);									
-		setDatePicker();
+		try{
+		initButtons();
+		}catch(Exception e){
+			System.out.println("Erro iniButtons" + e.getMessage());
+		}
+		
+		try{
+			initImages();
+		}catch(Exception e){
+			System.out.println("Erro initImages" + e.getMessage());
+		}
 		
 		
+		try{
+			lstTarefas = controler.getTasks("");
+		}catch(Exception e){
+			System.out.println("Erro getTasks" + e.getMessage());
+		}
+		
+		try{
+			carregaTabela(lstTarefas);									
+			setDatePicker();
+		}catch(Exception e){
+			System.out.println("Erro carregaTabela" + e.getMessage());
+		}
 	}
 
-	private void initImages() {
-		FrameLogin frameLogin= new FrameLogin();
-		JLabel logoPerolla = frameLogin.setIconAplication("/images/LogoPerolla.png",70,350);				
-		logoPerolla.setBounds(10, 11, 479, 89);
-		contentPane.add(logoPerolla);
+	public void initImages() {
+		frameLogin= new FrameLogin();
+		lbl_logo = frameLogin.setIconAplication("/images/LogoPerolla_icon.png",80,350,11,126);				
+		lbl_logo.setBounds(-40, 11, 479, 89);
+		contentPane.add(lbl_logo);
 	}
 	
 	public void initButtons(){
 		/*Botão Escolhe Data*/
 		btn_EscolheData = new JButton("Escolher data");
+		btn_EscolheData.setMargin(new Insets(2, 1, 2, 14));
+		btn_EscolheData.setMaximumSize(new Dimension(87, 13));
+		btn_EscolheData.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		btn_EscolheData.setIcon(new ImageIcon(FrameGerenciaTarefas.class.getResource("/images/calendar-question.png")));
 		btn_EscolheData.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+		
+		
+		
 		btn_EscolheData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			
+							
+				//conexao.selectAtoa();
+				
 				contentPane.remove(scrollPane);
-				Date date = (Date) datePicker.getModel().getValue();				
-				java.sql.Date sqlDate = new java.sql.Date(date.getTime());								
-				lstTarefas = getTasks((sqlDate.toString()).equals("")?"2017-02-10":sqlDate.toString());								
-				carregaTabela(lstTarefas);
+				Date date = (Date) datePicker.getModel().getValue();
+				if (date == null){
+					JOptionPane.showMessageDialog(btn_EscolheData,"É necessário escolher uma data.");
+				}else{
+					java.sql.Date sqlDate = new java.sql.Date(date.getTime());								
+					//lstTarefas = controler.getTasks((sqlDate.toString()).equals("")?"2017-02-10":sqlDate.toString());
+					lstTarefas = controler.getTasks((sqlDate.toString()).equals("")?"2017-02-10":sqlDate.toString());
+					carregaTabela(lstTarefas);
+				}
+				
 				
 			}
 		});
-		btn_EscolheData.setBackground(new Color(204, 204, 204));						
-		btn_EscolheData.setBounds(260, 111, 124, 23);
+		btn_EscolheData.setBackground(SystemColor.control);						
+		btn_EscolheData.setBounds(260, 101, 141, 33);
 		contentPane.add(btn_EscolheData);	
 		
 		
 		/*Botão Salvar*/
-		JButton btnSalvar = new JButton("Salvar");
-		btnSalvar.setBounds(883, 407, 111, 33);
+		JButton btnSalvar = new JButton("");
+		btnSalvar.setIcon(new ImageIcon(FrameGerenciaTarefas.class.getResource("/images/content-save.png")));
+		btnSalvar.setSize(new Dimension(20, 20));
+		btnSalvar.setFocusPainted(false);
+		btnSalvar.setBackground(SystemColor.control);
+		btnSalvar.setBounds(883, 407, 111, 45);
 		contentPane.add(btnSalvar);		
 		btnSalvar.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				 String descricao,andamento,observacao;
+				 String descricao,andamento,observacao,dataSelecionada;
 				 int prioridade,id;
 				 boolean status;
 				
@@ -163,20 +217,15 @@ public class FrameGerenciaTarefas extends JFrame {
 				for (int i =0;i< table.getModel().getRowCount();i++){							
 					if (table.getModel().getValueAt(i, 5)==null && table.getModel().getValueAt(i, 0)!=null){
 						System.out.println(i + "º Loop");
-						descricao = trataNulo(table.getModel().getValueAt(i, 0));
 						
-
-						andamento = trataNulo(table.getModel().getValueAt(i, 1));
-									
+						descricao = trataNulo(table.getModel().getValueAt(i, 0));						
+						andamento = trataNulo(table.getModel().getValueAt(i, 1));															
+						prioridade= Integer.parseInt(trataNulo((table.getModel().getValueAt(i, 2)==null?0:table.getModel().getValueAt(i, 2))));											
+						status = (trataNulo (table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true: false );
+						observacao = trataNulo(table.getModel().getValueAt(i, 4));
+						dataSelecionada = datePicker.getJFormattedTextField().getText().toString(); 
+						controler.inserirTarefa(descricao, andamento, prioridade, status, observacao,dataSelecionada);
 						
-						prioridade= Integer.parseInt(trataNulo((table.getModel().getValueAt(i, 2)==null?0:table.getModel().getValueAt(i, 2))));						
-
-						
-						status = (table.getModel().getValueAt(i, 3).equals("Pendente")? false : true);
-
-						observacao = trataNulo(table.getModel().getValueAt(i, 4));							
-																
-						conexaoBD.inserir(descricao, andamento, prioridade, status, observacao);
 						
 					}else if (table.getModel().getValueAt(i, 5)!=null && table.getModel().getValueAt(i, 0)!=null){
 						System.out.println(i + "º Loop");
@@ -184,13 +233,18 @@ public class FrameGerenciaTarefas extends JFrame {
 						descricao = trataNulo(table.getModel().getValueAt(i, 0).toString());
 						andamento = trataNulo(table.getModel().getValueAt(i, 1).toString());
 						prioridade= Integer.parseInt(trataNulo(table.getModel().getValueAt(i, 2).toString()));
-						status = (table.getModel().getValueAt(i, 3).equals("Pendente")? false : true);
-						observacao = trataNulo(table.getModel().getValueAt(i, 4).toString());							
+						status = (trataNulo(table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true : false );
+						observacao = trataNulo(table.getModel().getValueAt(i, 4).toString());
+						dataSelecionada = datePicker.getJFormattedTextField().getText().toString();
 						id=  Integer.parseInt(table.getModel().getValueAt(i, 5).toString());
 												
-						conexaoBD.update(id, descricao, andamento, prioridade, status, observacao);
+						controler.alterarTarefa(id, descricao, andamento, prioridade, status, observacao,dataSelecionada) ;
 					}
-				}	
+					
+					
+				}
+				
+				btn_EscolheData.doClick();
 				
 			}
 		});
@@ -198,37 +252,46 @@ public class FrameGerenciaTarefas extends JFrame {
 		
 		/*Botão Replicar*/
 		JButton btnReplicar = new JButton("Replicar");
-		btnReplicar.setBounds(1004, 407, 99, 33);
+		btnReplicar.setMaximumSize(new Dimension(61, 13));
+		btnReplicar.setIconTextGap(1);
+		btnReplicar.setIcon(new ImageIcon(FrameGerenciaTarefas.class.getResource("/images/content-duplicate.png")));
+		btnReplicar.setForeground(SystemColor.desktop);
+		btnReplicar.setBounds(1004, 407, 140, 45);
+		btnReplicar.setBackground(SystemColor.control);
 		contentPane.add(btnReplicar);
 		
 	}
 		
-
 	private void setDatePicker() {
-		UtilDateModel model = new UtilDateModel();			
+		
+		
+		
+		UtilDateModel model = new UtilDateModel();	
 		Properties p = new Properties();
+		
 		p.put("text.today", "Today");
 		p.put("text.month", "Month");
 		p.put("text.year", "Year");
 		
-		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);		
-		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());		
+		
+		  
+		 
+		JDatePanelImpl datePanel = new JDatePanelImpl(model, p); 		
+		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+				
 		//setContentPane(datePicker);		
 		panel = new JPanel();
-		panel.setBackground(new Color(204, 204, 255));
-		panel.setBounds(10, 101, 240, 33);
+		panel.setBackground(SystemColor.inactiveCaptionBorder);
+		panel.setBounds(10, 101, 240, 33); 
 		
+		//datePicker.getJFormattedTextField().setText(current_date.replace("/", "-"));
 		
 		panel.add(datePicker);		
+		
 		contentPane.add(panel);
-		
-		lblNewLabel = new JLabel("Controle de Tarefas");
-		lblNewLabel.setFont(new Font("Segoe UI", Font.BOLD, 53));
-		lblNewLabel.setBounds(590, 0, 554, 102);
-		contentPane.add(lblNewLabel);
-		
-		
 	}
+	
+	
 	
 	private Locale getLocale(String loc){
 		if (loc !=null && loc.length()>0){
@@ -257,6 +320,7 @@ public class FrameGerenciaTarefas extends JFrame {
 						
 		
 		table = new JTable(data,new String[]{"Sexta"+"","dia","Prioridade","Status","Obs","Id"});
+		table.setSelectionBackground(new Color(204, 255, 153));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		table.getColumnModel().getColumn(0).setPreferredWidth(450);
@@ -270,47 +334,7 @@ public class FrameGerenciaTarefas extends JFrame {
 		scrollPane.setBounds(10, 145, 1144, 251);
 		
 		contentPane.add(scrollPane);
-		
 					
-	}
-
-	
-	
-	public List<Tarefa> getTasks(String date) {
-		
-		List<Tarefa> lstTarefas = new ArrayList();
-		Tarefa tarefa;
-		//select CONVERT(VARCHAR(10),  Tarefa.data_tarefa, 103),CONVERT(VARCHAR(10),  GETDATE(), 103)  AS "103" from Tarefa order by data_tarefa,prioridade ;
-		conexaoBD.connect();
-		
-		ResultSet rs;
-		if (date.equals("")){
-			 rs = conexaoBD.executar("select Tarefa.* from Tarefa where CONVERT(VARCHAR(10),  Tarefa.data_tarefa, 103)=CONVERT(VARCHAR(10) ,  GETDATE(), 103) order by  data_tarefa ,prioridade desc");			 
-		}else{
-			 rs = conexaoBD.executar("select Tarefa.* from Tarefa where Tarefa.data_tarefa='"+ date +"' order by  data_tarefa ,prioridade desc");			 
-		}
-				
-		try {
-			while (rs.next()){							
-				tarefa = new Tarefa();
-				tarefa.setId(rs.getInt("id"));
-				tarefa.setDescricao(rs.getString("descricao"));
-				tarefa.setAndamento(rs.getString("andamento"));
-				tarefa.setPrioridade(rs.getInt("prioridade"));
-				tarefa.setStatus(rs.getBoolean("status"));
-				tarefa.setObservacao(rs.getString("observacao"));
-				tarefa.setDataTarefa(rs.getDate("data_tarefa"));				
-				
-				lstTarefas.add(tarefa);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
-			conexaoBD.disconnect();
-		}
-		
-		return lstTarefas;
 	}
 	
 	public String trataNulo(Object object) {

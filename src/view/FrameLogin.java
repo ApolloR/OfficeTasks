@@ -1,4 +1,4 @@
-package br.com.perolla;
+package view;
 
 import java.awt.EventQueue;
 
@@ -29,7 +29,6 @@ import javax.swing.border.TitledBorder;
 import com.sun.javafx.geom.transform.GeneralTransform3D;
 
 import CustomComponents.ImagePanel;
-import dao.ConexaoBD;
 
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -47,6 +46,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.DebugGraphics;
 import java.awt.Cursor;
 import images.*;
+import model.ConexaoBD;
 
 public class FrameLogin implements ActionListener {
 
@@ -93,7 +93,7 @@ public class FrameLogin implements ActionListener {
 		
 		/* Icone de usuário */
 		
-		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100));
+		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100,35,150));
 			    
 		buttonCreation();
 		textFieldsCreation();		
@@ -142,7 +142,7 @@ public class FrameLogin implements ActionListener {
 		frame.getContentPane().add(btn_Entrar);
 	}
 
-	public final JLabel setIconAplication(String pathImage,int heith,int weidth) {
+	public final JLabel setIconAplication(String pathImage,int heith,int weidth,int padBotton,int padLeft) {
 		Image img = null;
 		try {
 			
@@ -165,7 +165,7 @@ public class FrameLogin implements ActionListener {
 		System.out.println("SetIconApplication - Caminho absoluto:" + FrameLogin.class.getResource("/images/log_icon.png"));
 		login_icon.setDisabledIcon(new ImageIcon(FrameLogin.class.getResource("/images/log_icon.png")));
 		login_icon.setDebugGraphicsOptions(DebugGraphics.BUFFERED_OPTION);
-		login_icon.setBounds(126, 11, 100, 100);
+		login_icon.setBounds(padLeft,padBotton, 100, 100);
 		
 		return login_icon;
 		
@@ -200,6 +200,7 @@ public class FrameLogin implements ActionListener {
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
