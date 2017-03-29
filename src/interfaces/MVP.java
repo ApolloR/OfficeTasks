@@ -1,5 +1,6 @@
 package interfaces;
 
+import java.util.Date;
 import java.util.List;
 
 import bean.Tarefa;
@@ -24,6 +25,8 @@ public interface MVP {
 				String data);
 		void alterarTarefa(int id, String descricao, String andamento, int prioridade, boolean status, String observacao,
 				String data);
+		
+		boolean verificaData(Date date);
 	}
 	
 

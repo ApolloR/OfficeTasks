@@ -93,16 +93,11 @@ public class FrameLogin implements ActionListener {
 		
 		/* Icone de usuário */
 		
-		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100,35,150));
+		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100,20,130));
 			    
 		buttonCreation();
 		textFieldsCreation();		
 		labelsCreation();
-		
-		
-		
-		
-		
 	}
 
 	private void labelsCreation() {

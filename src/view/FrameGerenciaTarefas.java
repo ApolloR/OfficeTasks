@@ -27,6 +27,7 @@ import bean.Tarefa;
 import controller.Controller;
 import interfaces.MVP;
 import javafx.scene.control.DatePicker;
+import javafx.scene.input.DataFormat;
 import model.ConexaoBD;
 
 import java.awt.GridLayout;
@@ -44,7 +45,10 @@ import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import java.awt.SystemColor;
@@ -62,19 +66,24 @@ import java.awt.Insets;
 public class FrameGerenciaTarefas extends JFrame {
 
 	private JPanel contentPane;
+	private JLabel lblWeekDay;
 	public static int x;
 	public static int y;
 	private JTable table;
 	private JButton btn_EscolheData;
 	private JPanel panel;
-	
+	private int day,month,year;
+	private int selectedDay,selectedMonth,selectedYear;
+	private String dayOfTheWeek;
+	private MVP.ControllerImpl controler = new Controller();
+	private LocalDate localCurrentDate;
 	JDatePickerImpl datePicker;
 	JScrollPane scrollPane;
 	FrameLogin frameLogin;
-	JLabel lbl_logo;
-	private String current_date ;
-	private MVP.ControllerImpl controler = new Controller();
+	JLabel lbl_logo;	
+	
 	ConexaoBD conexao = new ConexaoBD();
+	
 	
 	
 	
@@ -109,22 +118,7 @@ public class FrameGerenciaTarefas extends JFrame {
 	 */
 		
 	public FrameGerenciaTarefas() {
-		setBackground(new Color(204, 204, 255));
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 1170, 501);
-		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		x = (int) ((dimension.getWidth() - getWidth())/2);
-		y = (int) ((dimension.getHeight() - getHeight())/2);
-		setLocation(x, y);
-		contentPane = new JPanel();
-		contentPane.setBackground(SystemColor.inactiveCaptionBorder);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);				
-		java.util.Date date = new Date();
-		current_date = java.text.DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
-		
-		System.out.println(current_date.replace("/", "-"));
+		setJFrame();		
 		
 		try{
 		initButtons();
@@ -147,10 +141,41 @@ public class FrameGerenciaTarefas extends JFrame {
 		
 		try{
 			carregaTabela(lstTarefas);									
-			setDatePicker();
+			
 		}catch(Exception e){
 			System.out.println("Erro carregaTabela" + e.getMessage());
 		}
+		
+		try{
+			setDatePicker();								
+			
+		}catch(Exception e){
+			System.out.println("Erro setDatePicker" + e.getMessage());
+		}
+		
+	}
+
+	private void setJFrame() {
+		setBackground(new Color(204, 204, 255));
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 1170, 501);
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		x = (int) ((dimension.getWidth() - getWidth())/2);
+		y = (int) ((dimension.getHeight() - getHeight())/2);
+		setLocation(x, y);
+		contentPane = new JPanel();
+		contentPane.setBackground(SystemColor.inactiveCaptionBorder);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		lblWeekDay = new JLabel("Day Of the Week");
+		lblWeekDay.setFont(new Font("Segoe UI", Font.BOLD, 23));
+		lblWeekDay.setSize(new Dimension(10, 10));
+		lblWeekDay.setBounds(411, 99, 337, 33);
+		contentPane.add(lblWeekDay);		
+		getCurrentDate();	
+		
+		
 	}
 
 	public void initImages() {
@@ -179,9 +204,10 @@ public class FrameGerenciaTarefas extends JFrame {
 				
 				contentPane.remove(scrollPane);
 				Date date = (Date) datePicker.getModel().getValue();
-				if (date == null){
-					JOptionPane.showMessageDialog(btn_EscolheData,"É necessário escolher uma data.");
-				}else{
+				
+				if (controler.verificaData(date)){
+					getSelectedDate(date);
+					lblWeekDay.setText("Dia " + selectedDay +"/"+ selectedMonth +"  "+ getDayOfWeek(date));
 					java.sql.Date sqlDate = new java.sql.Date(date.getTime());								
 					//lstTarefas = controler.getTasks((sqlDate.toString()).equals("")?"2017-02-10":sqlDate.toString());
 					lstTarefas = controler.getTasks((sqlDate.toString()).equals("")?"2017-02-10":sqlDate.toString());
@@ -214,37 +240,39 @@ public class FrameGerenciaTarefas extends JFrame {
 				
 				ResultSet rs ;
 				
-				for (int i =0;i< table.getModel().getRowCount();i++){							
-					if (table.getModel().getValueAt(i, 5)==null && table.getModel().getValueAt(i, 0)!=null){
-						System.out.println(i + "º Loop");
-						
-						descricao = trataNulo(table.getModel().getValueAt(i, 0));						
-						andamento = trataNulo(table.getModel().getValueAt(i, 1));															
-						prioridade= Integer.parseInt(trataNulo((table.getModel().getValueAt(i, 2)==null?0:table.getModel().getValueAt(i, 2))));											
-						status = (trataNulo (table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true: false );
-						observacao = trataNulo(table.getModel().getValueAt(i, 4));
-						dataSelecionada = datePicker.getJFormattedTextField().getText().toString(); 
-						controler.inserirTarefa(descricao, andamento, prioridade, status, observacao,dataSelecionada);
-						
-						
-					}else if (table.getModel().getValueAt(i, 5)!=null && table.getModel().getValueAt(i, 0)!=null){
-						System.out.println(i + "º Loop");
-						
-						descricao = trataNulo(table.getModel().getValueAt(i, 0).toString());
-						andamento = trataNulo(table.getModel().getValueAt(i, 1).toString());
-						prioridade= Integer.parseInt(trataNulo(table.getModel().getValueAt(i, 2).toString()));
-						status = (trataNulo(table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true : false );
-						observacao = trataNulo(table.getModel().getValueAt(i, 4).toString());
-						dataSelecionada = datePicker.getJFormattedTextField().getText().toString();
-						id=  Integer.parseInt(table.getModel().getValueAt(i, 5).toString());
-												
-						controler.alterarTarefa(id, descricao, andamento, prioridade, status, observacao,dataSelecionada) ;
+				Date date = (Date) datePicker.getModel().getValue();
+				if (controler.verificaData(date)){														
+					for (int i =0;i< table.getModel().getRowCount();i++){							
+						if (table.getModel().getValueAt(i, 5)==null && table.getModel().getValueAt(i, 0)!=null){
+							System.out.println(i + "º Loop");
+							
+							descricao = trataNulo(table.getModel().getValueAt(i, 0));						
+							andamento = trataNulo(table.getModel().getValueAt(i, 1));															
+							prioridade= Integer.parseInt(trataNulo((table.getModel().getValueAt(i, 2)==null?0:table.getModel().getValueAt(i, 2))));											
+							status = (trataNulo (table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true: false );
+							observacao = trataNulo(table.getModel().getValueAt(i, 4));
+							dataSelecionada = datePicker.getJFormattedTextField().getText().toString(); 
+							controler.inserirTarefa(descricao, andamento, prioridade, status, observacao,dataSelecionada);
+							
+							
+						}else if (table.getModel().getValueAt(i, 5)!=null && table.getModel().getValueAt(i, 0)!=null){
+							System.out.println(i + "º Loop");
+							
+							descricao = trataNulo(table.getModel().getValueAt(i, 0).toString());
+							andamento = trataNulo(table.getModel().getValueAt(i, 1).toString());
+							prioridade= Integer.parseInt(trataNulo(table.getModel().getValueAt(i, 2).toString()));
+							status = (trataNulo(table.getModel().getValueAt(i, 3)).equals("Ok") || trataNulo(table.getModel().getValueAt(i, 3)).equals("Finalizada")? true : false );
+							observacao = trataNulo(table.getModel().getValueAt(i, 4).toString());
+							dataSelecionada = datePicker.getJFormattedTextField().getText().toString();
+							id=  Integer.parseInt(table.getModel().getValueAt(i, 5).toString());
+													
+							controler.alterarTarefa(id, descricao, andamento, prioridade, status, observacao,dataSelecionada) ;
+						}										
 					}
-					
-					
+					btn_EscolheData.doClick();
 				}
 				
-				btn_EscolheData.doClick();
+				
 				
 			}
 		});
@@ -265,8 +293,12 @@ public class FrameGerenciaTarefas extends JFrame {
 	private void setDatePicker() {
 		
 		
+		UtilDateModel model = new UtilDateModel();
 		
-		UtilDateModel model = new UtilDateModel();	
+		model.setDate(year, month-1, day);
+		model.setSelected(true);
+		
+		
 		Properties p = new Properties();
 		
 		p.put("text.today", "Today");
@@ -284,12 +316,58 @@ public class FrameGerenciaTarefas extends JFrame {
 		panel.setBackground(SystemColor.inactiveCaptionBorder);
 		panel.setBounds(10, 101, 240, 33); 
 		
-		//datePicker.getJFormattedTextField().setText(current_date.replace("/", "-"));
+		
+		lblWeekDay.setText("Dia " + day +"/"+ month +"  "+ getDayOfWeek(new Date()));
+		
 		
 		panel.add(datePicker);		
 		
-		contentPane.add(panel);
+		contentPane.add(panel);			
+				
 	}
+
+	private void getCurrentDate() {		
+		localCurrentDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
+		day = localCurrentDate.getDayOfMonth();
+		month = localCurrentDate.getMonthValue();
+		year = localCurrentDate.getYear();				
+				
+	}
+	
+	private void getSelectedDate(Date date){
+		LocalDate localdate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		selectedDay = localdate.getDayOfMonth();
+		selectedMonth = localdate.getMonthValue();
+		selectedYear= localdate.getYear();		
+	}
+	
+	private String getDayOfWeek(Date date){
+		LocalDate localdate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		
+		switch (localdate.getDayOfWeek().toString()){
+		case("MONDAY"):
+			return "Segunda - feira";
+			
+		case("TUESDAY"):
+			return "Terça - feira";
+			
+		case("WEDNESDAY"):
+			return "Quarta - feira";
+			
+		case("THURSDAY"):
+			return "Quinta - feira";
+			
+		case("FRIDAY"):
+			return "Sexta - feira";
+			
+		case("SATURDAY"):
+			return "Sábado";			
+		default:
+			return "Domingo";			
+		}
+				
+	}
+	
 	
 	
 	
@@ -319,13 +397,14 @@ public class FrameGerenciaTarefas extends JFrame {
 		}
 						
 		
-		table = new JTable(data,new String[]{"Sexta"+"","dia","Prioridade","Status","Obs","Id"});
+		table = new JTable(data,new String[]{"Descrição da Tarefa","Nota","Prioridade","Status","Obs","Id"});
 		table.setSelectionBackground(new Color(204, 255, 153));
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		table.getColumnModel().getColumn(0).setPreferredWidth(450);
 		table.getColumnModel().getColumn(4).setPreferredWidth(450);
 		table.getColumnModel().getColumn(5).setPreferredWidth(0);
+		
 		
 		
 		scrollPane = new JScrollPane(table);
