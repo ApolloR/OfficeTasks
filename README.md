@@ -3,7 +3,7 @@
 A software designed to help organize office tasks. At beginning it was only developed for my own necessities but my cooworkers liked then a spreaded the application and decided to share the code for that ones who also likes or wants to improve the code. 
 The software provids specific fields to be filled in a spreadsheet like:
     
-        description, andamento , priority,status,observation,date
+        description, progress , priority,status,observation,date
 
 The spreadsheet will always bring informations about the selected day, filling the fields above with the previous registered information.
        
