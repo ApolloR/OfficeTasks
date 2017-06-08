@@ -1,12 +1,16 @@
 package model;
 
+import java.security.KeyStore.PasswordProtection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.security.auth.callback.PasswordCallback;
 
 import bean.Tarefa;
 import interfaces.MVP;
@@ -166,16 +170,27 @@ public class GerenciaBanco implements MVP.ModelImpl {
 		return lstTarefas;
 	}
 
-	@Override
-	public boolean validateUser(String user, String psw) {
-		ResultSet rs = null;
+	
+	public boolean validateUser(String user, char[] psw) {
 		
-		rs = executar("select * from Usuario where \"user\" ='"+user+"' and password = '"+psw+"'");
+		boolean authenticated = false;
+		ResultSet rs = null;
+		PasswordProtection p = new PasswordProtection(psw);
+		
+		
+		rs = executar("select * from Usuario where \"user\" ='"+user+"'");
 		
 		try {
 			if (rs.next()){
 				
-				return true;
+				char[] correctPassword = rs.getString("password").toCharArray();
+				
+				if( Arrays.equals(psw, correctPassword))
+					authenticated=true;
+				
+				Arrays.fill(correctPassword, '0');
+				Arrays.fill(psw, '0');
+				
 			}
 			
 		} catch (SQLException e) {
@@ -184,7 +199,7 @@ public class GerenciaBanco implements MVP.ModelImpl {
 		}
 		
 		
-		return false;
+		return authenticated;
 	}
 
 }

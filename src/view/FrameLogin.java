@@ -204,7 +204,7 @@ public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 		
 		//if (e.getSource().equals("btn_entrar")){
 			//if (txt_Login.getText().toString().equals("Apolo") && (txt_Senha.getText().toString().equals("1234"))){
-			if (validateUser(txt_Login.getText().toString(),txt_Senha.getText().toString())){
+			if (validateUser(txt_Login.getText().toString(),txt_Senha.getPassword())){
 				FrameGerenciaTarefas tarefas = new FrameGerenciaTarefas();
 				tarefas.setVisible(true);
 			}else{
@@ -216,7 +216,7 @@ public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 	}
 
 	@Override
-	public boolean validateUser(String user, String psw) {
+	public boolean validateUser(String user, char[] psw) {
 		
 		return controller.validateUser(user, psw);
 	}

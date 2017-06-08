@@ -21,7 +21,7 @@ public class ControllerLogin implements MVP.ControllerLoginImpl {
 	
 	
 	@Override
-	public boolean validateUser(String user, String psw) {								
+	public boolean validateUser(String user, char[] psw) {								
 		return model.validateUser(user, psw);
 	}
 
