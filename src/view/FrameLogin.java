@@ -29,6 +29,7 @@ import javax.swing.border.TitledBorder;
 import com.sun.javafx.geom.transform.GeneralTransform3D;
 
 import CustomComponents.ImagePanel;
+import controller.ControllerLogin;
 
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -46,14 +47,16 @@ import javax.swing.JDesktopPane;
 import javax.swing.DebugGraphics;
 import java.awt.Cursor;
 import images.*;
+import interfaces.MVP;
 import model.ConexaoBD;
 
-public class FrameLogin implements ActionListener {
+public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 
 	private JFrame frame;
 	private JTextField txt_Login;
 	private JPasswordField txt_Senha;
 	private JButton btn_Entrar;
+	private MVP.ControllerLoginImpl controller;
 	
 	private JLabel lblLogin = new JLabel("Login");
 
@@ -94,7 +97,7 @@ public class FrameLogin implements ActionListener {
 		/* Icone de usuário */
 		
 		frame.getContentPane().add(setIconAplication("/images/log_icon.png",100,100,20,130));
-			    
+		controller = new ControllerLogin();	  // Fazendo vinculo com o presenter  
 		buttonCreation();
 		textFieldsCreation();		
 		labelsCreation();
@@ -200,7 +203,8 @@ public class FrameLogin implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		//if (e.getSource().equals("btn_entrar")){
-			if (txt_Login.getText().toString().equals("Apolo") && (txt_Senha.getText().toString().equals("1234"))){
+			//if (txt_Login.getText().toString().equals("Apolo") && (txt_Senha.getText().toString().equals("1234"))){
+			if (validateUser(txt_Login.getText().toString(),txt_Senha.getText().toString())){
 				FrameGerenciaTarefas tarefas = new FrameGerenciaTarefas();
 				tarefas.setVisible(true);
 			}else{
@@ -210,4 +214,12 @@ public class FrameLogin implements ActionListener {
 		
 		
 	}
+
+	@Override
+	public boolean validateUser(String user, String psw) {
+		
+		return controller.validateUser(user, psw);
+	}
+	
+
 }

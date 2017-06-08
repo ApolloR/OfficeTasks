@@ -1,67 +1,43 @@
 package view;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import org.jdatepicker.JDatePanel;
-import org.jdatepicker.JDatePicker;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import CustomComponents.DateLabelFormatter;
 import bean.Tarefa;
-import controller.Controller;
+import controller.ControllerGerencia;
 import interfaces.MVP;
-import javafx.scene.control.DatePicker;
-import javafx.scene.input.DataFormat;
 import model.ConexaoBD;
-
-import java.awt.GridLayout;
-import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
-import javax.imageio.ImageIO;
-import javax.rmi.CORBA.UtilDelegate;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import java.awt.SystemColor;
-import org.jdatepicker.*;
-import java.awt.Color;
-import java.awt.Panel;
-import javax.swing.JLabel;
-import java.awt.Font;
-import javax.swing.UIManager;
-import javax.swing.SwingConstants;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
-import java.awt.Insets;
 
 public class FrameGerenciaTarefas extends JFrame {
 
@@ -75,19 +51,14 @@ public class FrameGerenciaTarefas extends JFrame {
 	private int day,month,year;
 	private int selectedDay,selectedMonth,selectedYear;
 	private String dayOfTheWeek;
-	private MVP.ControllerImpl controler = new Controller();
+	private MVP.ControllerGerenciaImpl controler = new ControllerGerencia();
 	private LocalDate localCurrentDate;
 	JDatePickerImpl datePicker;
 	JScrollPane scrollPane;
 	FrameLogin frameLogin;
 	JLabel lbl_logo;	
 	
-	ConexaoBD conexao = new ConexaoBD();
-	
-	
-	
-	
-	
+	ConexaoBD conexao = new ConexaoBD();	
 	List<Tarefa> lstTarefas = new ArrayList();
 	
 
@@ -230,6 +201,7 @@ public class FrameGerenciaTarefas extends JFrame {
 		btnSalvar.setBackground(SystemColor.control);
 		btnSalvar.setBounds(883, 407, 111, 45);
 		contentPane.add(btnSalvar);		
+		
 		btnSalvar.addActionListener(new ActionListener() {
 			
 			@Override
@@ -313,6 +285,7 @@ public class FrameGerenciaTarefas extends JFrame {
 				
 		//setContentPane(datePicker);		
 		panel = new JPanel();
+		panel.setOpaque(false);
 		panel.setBackground(SystemColor.inactiveCaptionBorder);
 		panel.setBounds(10, 101, 240, 33); 
 		
@@ -323,6 +296,12 @@ public class FrameGerenciaTarefas extends JFrame {
 		panel.add(datePicker);		
 		
 		contentPane.add(panel);			
+		
+		JLabel lblNewLabel = new JLabel("");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		lblNewLabel.setIcon(new ImageIcon(FrameGerenciaTarefas.class.getResource("/images/Gradient-Computer-Background.jpg")));
+		lblNewLabel.setBounds(0, 0, 1154, 463);
+		contentPane.add(lblNewLabel);
 				
 	}
 
@@ -367,10 +346,7 @@ public class FrameGerenciaTarefas extends JFrame {
 		}
 				
 	}
-	
-	
-	
-	
+			
 	private Locale getLocale(String loc){
 		if (loc !=null && loc.length()>0){
 			return new Locale(loc);
@@ -410,7 +386,7 @@ public class FrameGerenciaTarefas extends JFrame {
 		scrollPane = new JScrollPane(table);
 		scrollPane.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(10, 145, 1144, 251);
+		scrollPane.setBounds(0, 145, 1154, 251);
 		
 		contentPane.add(scrollPane);
 					

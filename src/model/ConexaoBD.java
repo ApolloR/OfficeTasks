@@ -39,7 +39,7 @@ public class ConexaoBD {
 
 	public ConexaoBD() {
 		//this.host = "ADM04\\SQLSERVER2008";
-		this.host = "192.168.0.119";
+		this.host = "192.168.0.240";
 		this.database = "Tarefas";
 		this.user = "Apolo";
 		this.pass = "1234";

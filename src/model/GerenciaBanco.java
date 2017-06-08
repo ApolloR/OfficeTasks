@@ -97,10 +97,10 @@ public class GerenciaBanco implements MVP.ModelImpl {
 	}
 
 	
-	public ResultSet executar(String query) {
+	protected ResultSet executar(String query) {
 		conexao.connect();
 		c = conexao.getConnection();
-
+		
 		Statement st;
 		ResultSet rs;
 
@@ -164,6 +164,27 @@ public class GerenciaBanco implements MVP.ModelImpl {
 		}
 
 		return lstTarefas;
+	}
+
+	@Override
+	public boolean validateUser(String user, String psw) {
+		ResultSet rs = null;
+		
+		rs = executar("select * from Usuario where \"user\" ='"+user+"' and password = '"+psw+"'");
+		
+		try {
+			if (rs.next()){
+				
+				return true;
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return false;
 	}
 
 }

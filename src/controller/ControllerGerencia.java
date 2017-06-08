@@ -11,14 +11,14 @@ import interfaces.MVP;
 import model.ConexaoBD;
 import model.GerenciaBanco;
 
-public class Controller implements MVP.ControllerImpl{
+public class ControllerGerencia implements MVP.ControllerGerenciaImpl{
 	
 	private MVP.ViewImpl view;
 	private MVP.ModelImpl model;
 	//private ConexaoBD model;
 	
 	
-	public Controller(){
+	public ControllerGerencia(){
 		model = new GerenciaBanco();
 		//model = new ConexaoBD();
 	}

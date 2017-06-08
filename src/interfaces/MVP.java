@@ -13,13 +13,16 @@ public interface MVP {
 		void insert(String descricao, String andamento, int prioridade, boolean status, String observacao,
 				String data);
 		List<Tarefa> select(String date);
+		
+		boolean validateUser(String user,String pwd);
+		
 	}
 	
 	interface ViewImpl{
 		
 	}
 	
-	interface ControllerImpl{
+	interface ControllerGerenciaImpl{
 		List<Tarefa> getTasks(String date);
 		void inserirTarefa(String descricao, String andamento, int prioridade, boolean status, String observacao,
 				String data);
@@ -27,6 +30,10 @@ public interface MVP {
 				String data);
 		
 		boolean verificaData(Date date);
+	}
+	
+	interface ControllerLoginImpl{
+		boolean validateUser(String user,String psw);				
 	}
 	
 
