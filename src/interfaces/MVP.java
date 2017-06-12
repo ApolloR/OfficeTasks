@@ -20,6 +20,7 @@ public interface MVP {
 	
 	interface ViewImpl{
 		
+		
 	}
 	
 	interface ControllerGerenciaImpl{
