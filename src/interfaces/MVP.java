@@ -14,7 +14,7 @@ public interface MVP {
 				String data);
 		List<Tarefa> select(String date);
 		
-		boolean validateUser(String user,char[] psw);
+		int validateUser(String user,char[] psw);
 		
 	}
 	
@@ -33,7 +33,7 @@ public interface MVP {
 	}
 	
 	interface ControllerLoginImpl{
-		boolean validateUser(String user,char[] psw);				
+		int validateUser(String user,char[] psw);				
 	}
 	
 

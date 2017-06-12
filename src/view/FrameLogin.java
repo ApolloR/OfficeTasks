@@ -57,6 +57,7 @@ public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 	private JPasswordField txt_Senha;
 	private JButton btn_Entrar;
 	private MVP.ControllerLoginImpl controller;
+	public static int userId=-1;
 	
 	private JLabel lblLogin = new JLabel("Login");
 
@@ -204,7 +205,8 @@ public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 		
 		//if (e.getSource().equals("btn_entrar")){
 			//if (txt_Login.getText().toString().equals("Apolo") && (txt_Senha.getText().toString().equals("1234"))){
-			if (validateUser(txt_Login.getText().toString(),txt_Senha.getPassword())){
+			if ((userId=(validateUser(txt_Login.getText().toString(),txt_Senha.getPassword())))>0){
+				
 				FrameGerenciaTarefas tarefas = new FrameGerenciaTarefas();
 				tarefas.setVisible(true);
 			}else{
@@ -216,7 +218,7 @@ public class FrameLogin implements ActionListener, MVP.ControllerLoginImpl {
 	}
 
 	@Override
-	public boolean validateUser(String user, char[] psw) {
+	public int validateUser(String user, char[] psw) {
 		
 		return controller.validateUser(user, psw);
 	}

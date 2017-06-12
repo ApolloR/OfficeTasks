@@ -14,6 +14,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import bean.Tarefa;
 import interfaces.MVP;
+import view.FrameLogin;
 
 public class GerenciaBanco implements MVP.ModelImpl {
 
@@ -133,10 +134,11 @@ public class GerenciaBanco implements MVP.ModelImpl {
 		try {
 			if (date.equals("")) {
 				rs = executar(
-						"select Tarefa.* from Tarefa where CONVERT(VARCHAR(10),  Tarefa.data_tarefa, 103)=CONVERT(VARCHAR(10) ,  GETDATE(), 103) order by  data_tarefa ,prioridade desc");
+						"select Tarefa.* from Tarefa where CONVERT(VARCHAR(10),  Tarefa.data_tarefa, 103)=CONVERT(VARCHAR(10) ,  GETDATE(), 103) and codUsuario = "+FrameLogin.userId +"order by  data_tarefa ,prioridade desc");
 			} else {
 				rs = executar("select Tarefa.* from Tarefa where Tarefa.data_tarefa='" + date
-						+ "' order by  data_tarefa ,prioridade desc");
+						+ "' and codUsuario = "+ FrameLogin.userId 
+						+ "order by  data_tarefa ,prioridade desc");
 			}
 		} catch (Exception e) {
 			System.out.println("Erro método Select" + e.getMessage());
@@ -171,9 +173,9 @@ public class GerenciaBanco implements MVP.ModelImpl {
 	}
 
 	
-	public boolean validateUser(String user, char[] psw) {
+	public int validateUser(String user, char[] psw) {
 		
-		boolean authenticated = false;
+		int authenticated = -1 ;
 		ResultSet rs = null;
 		PasswordProtection p = new PasswordProtection(psw);
 		
@@ -186,7 +188,8 @@ public class GerenciaBanco implements MVP.ModelImpl {
 				char[] correctPassword = rs.getString("password").toCharArray();
 				
 				if( Arrays.equals(psw, correctPassword))
-					authenticated=true;
+					authenticated=rs.getInt("id");
+				
 				
 				Arrays.fill(correctPassword, '0');
 				Arrays.fill(psw, '0');
